@@ -1,0 +1,25 @@
+/* src/ListEmployee.css */
+.employee-list-container {
+    margin-top: 2rem;
+  }
+  
+  .employee-list-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .employee-list-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .employee-table {
+    margin-top: 1rem;
+  }
+  
+  .employee-table-row {
+    text-align: center;
+  }
+  
