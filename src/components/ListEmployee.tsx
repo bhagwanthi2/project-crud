@@ -1,3 +1,4 @@
+// C:\Users\BhagwanthiM\OneDrive - 4i Apps Solutions Pvt Ltd\Desktop\project-crud\employees\src\components\ListEmployee.tsx
 import { useEffect, useState } from "react";
 import { getEmployees, deleteEmployee } from "../services/employeeService";
 import { useLocation } from "react-router-dom";
@@ -29,7 +30,8 @@ import {
   Box,
   Menu,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  CircularProgress
 } from "@mui/material";
 import {
   Dialog,
@@ -42,7 +44,7 @@ import {
 import { Employee } from "../types/Employee";
 import "./ListEmployee.css";
 
-const ListEmployee = () => {
+  const ListEmployee = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
@@ -53,19 +55,24 @@ const ListEmployee = () => {
 
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
-const [selectedId, setSelectedId] = useState<string | null>(null);
-const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  
+  const [loadingDelete, setLoadingDelete] = useState(false);
   const location = useLocation(); 
+  const [loading, setLoading] = useState(true); // Track loading state
+
+  
 
   useEffect(() => {
     if (location.state?.success) {
       setSnackbarMessage("Employee added successfully!");
       setOpenSnackbar(true);
+  
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state]); 
-
+  }, [location, navigate]);
+  
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -81,12 +88,20 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const fetchEmployees = async () => {
     try {
+      setLoading(true);
       const response = await getEmployees();
-      setEmployees(response.data);
+  
+      // Simulate delay
+      setTimeout(() => {
+        setEmployees(response.data);
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Failed to fetch employees", error);
+      setLoading(false); // Stop spinner on error
     }
   };
+  
 
   
   
@@ -94,10 +109,12 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
     setOpenBatchDialog(true);
   };
   const handleConfirmBatchDelete = async () => {
+    setLoadingDelete(true);
     await Promise.all(selected.map(id => deleteEmployee(id)));
     setSelected([]);
     fetchEmployees();
     setOpenBatchDialog(false);
+    setLoadingDelete(false);
   };
   
   
@@ -129,8 +146,15 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
   };
 
   const toggleFilter = () => {
-    setShowFilter(prev => !prev);
+    setShowFilter(prev => {
+      const newState = !prev;
+      if (!newState) {
+        setOrgFilter("");
+      }
+      return newState;
+    });
   };
+  
 
   const filteredEmployees = employees.filter((emp) =>
     (emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -142,12 +166,15 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
     setSelectedId(id);
     setOpenDialog(true);
   };
+  
   const handleConfirmDelete = async () => {
     if (selectedId) {
+      setLoadingDelete(true);
       await deleteEmployee(selectedId);
       fetchEmployees();
       setOpenDialog(false);
       setSelectedId(null);
+      setLoadingDelete(false)
     }
   };
   const startIndex = page * rowsPerPage;
@@ -157,8 +184,14 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
   const uniqueOrgs = Array.from(new Set(employees.map(emp => emp.organ)));
   
 
-  return (
-    <Container className="container">
+  return (<>
+  
+    {loading ? (
+      <Container className="container" sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
+      </Container>
+    ) :(
+      <Container className="container">
       <Typography variant="h4" className="header">Employee List</Typography>
 
       <Stack direction="row" justifyContent="space-between" alignItems="center" className="button" sx={{ mb: 2 }}>
@@ -185,9 +218,22 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
   </DialogContent>
   <DialogActions>
     <Button onClick={handleCancelDelete}>Cancel</Button>
-    <Button onClick={handleConfirmDelete} color="error">Delete</Button>
+    <Button onClick={handleConfirmBatchDelete} color="error" disabled={loadingDelete}  startIcon={loadingDelete ? <CircularProgress size={18} /> : undefined}> {loadingDelete ? <CircularProgress size={24} /> : 'Delete'}</Button>
   </DialogActions>
 </Dialog>
+<Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+  <DialogTitle>Confirm Deletion</DialogTitle>
+  <DialogContent>
+    <Typography>Are you sure you want to delete this employee?</Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+    <Button onClick={handleConfirmDelete} color="error" disabled={loadingDelete}>
+      {loadingDelete ? <CircularProgress size={24} /> : "Delete"}
+    </Button>
+  </DialogActions>
+</Dialog>
+
         <Stack direction="row" spacing={1}>
           <IconButton onClick={handleBatchDelete} disabled={selected.length === 0}>
             <DeleteOutline />
@@ -316,7 +362,7 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
   </DialogContent>
   <DialogActions>
     <Button onClick={() => setOpenBatchDialog(false)}>Cancel</Button>
-    <Button onClick={handleConfirmBatchDelete} color="error">Delete</Button>
+    <Button onClick={handleConfirmBatchDelete} color="error"  disabled={loadingDelete}>  {loadingDelete ? <CircularProgress size={24} /> : 'Delete'}</Button>
   </DialogActions>
 </Dialog> <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -331,8 +377,10 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
       </Snackbar>
 
       </TableContainer>
-    </Container>
+    </Container>   
+          )}
+          </>
   );
-};
+}
 
 export default ListEmployee;

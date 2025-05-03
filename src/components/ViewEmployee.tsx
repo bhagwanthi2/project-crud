@@ -9,26 +9,39 @@ import {
   CardContent,
   Stack,
   Divider,
-  Grid
+  Grid,
+  Alert,
+  CircularProgress
   
 } from "@mui/material";
 
 const ViewEmployee = () => {
   const { id } = useParams<{ id: string }>();
   const [employee, setEmployee] = useState<Employee | null>(null);
-
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const fetchEmployee = async () => {
+      if (!id) {
+        setError("Invalid Employee ID");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await getEmployeeById(id!);
+        const res = await getEmployeeById(id);
         setEmployee(res.data);
+        setLoading(false);
       } catch (err) {
-        console.error("Failed to fetch employee", err);
+        setError("Failed to fetch employee data");
+        setLoading(false);
       }
     };
+
     fetchEmployee();
   }, [id]);
-
+  if (loading) return <CircularProgress sx={{ mt: 4 }} />;
+  if (error) return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
   if (!employee) return <Typography>Loading...</Typography>;
 
   return (
@@ -38,12 +51,9 @@ const ViewEmployee = () => {
       </Typography>
       <Divider sx={{ mb: 3 }} />
 
-      {/* import { Grid } from '@mui/material'; */}
 
-      {/* import { Grid, Card, CardContent, Typography, Stack } from "@mui/material"; */}
 
 <Grid sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-  {/* Basic Info Card */}
   <Card>
     <CardContent>
       <Typography variant="h6" gutterBottom>
@@ -58,7 +68,6 @@ const ViewEmployee = () => {
     </CardContent>
   </Card>
 
-  {/* Addresses Card */}
   <Card>
     <CardContent>
       <Typography variant="h6" gutterBottom>
@@ -68,6 +77,7 @@ const ViewEmployee = () => {
         <Stack spacing={2}>
           {employee.addresses.map((addr, idx) => (
             <Card key={idx} variant="outlined" sx={{ p: 2 }}>
+               <Typography><strong>Address:</strong> {addr.address}</Typography>
               <Typography><strong>Location:</strong> {addr.location}</Typography>
               <Typography><strong>Pincode:</strong> {addr.pincode}</Typography>
               <Typography><strong>Contact:</strong> {addr.contact}</Typography>

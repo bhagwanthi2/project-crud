@@ -1,93 +1,98 @@
+// C:\Users\BhagwanthiM\OneDrive - 4i Apps Solutions Pvt Ltd\Desktop\project-crud\employees\src\components\CreateEmployee.tsx
 import { useState } from "react";
 import { useFormik } from "formik";
-import {
-  Container,
-  TextField,
-  Button,
-  Stack,
-  IconButton,
-  Typography,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper,
-  TablePagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Grid,
-  Card,
-  CardContent,
-  Snackbar,
-} from "@mui/material";
+import { 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  FormHelperText 
+} from '@mui/material';
+// import TextField from '@mui/material/TextField';
+
+
+// import { zodToFormik } from 'formik-zod'; 
+import { validateZodSchema } from './validateZodSchema';
+import { Container, TextField, Button, Stack, IconButton, Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { Add, DeleteOutline, Edit } from "@mui/icons-material";
 import { createEmployee } from "../services/employeeService";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./createEmployee.css";
-
-interface Address {
+import { employeeSchema } from "../validations/employeeSchema";
+import { zodResolver } from "@hookform/resolvers/zod"; // for Zod with Formik
+import {z} from "zod";
+import { Employee } from '../types/Employee';
+import { Card, CardContent, Grid } from '@mui/material';
+import { companyRoles } from "./companyRoles";
+type EmployeeFormData = z.infer<typeof employeeSchema>;
+type Address = {
   id: string;
+  address:string;
   location: string;
   pincode: string;
   contact: string;
-}
+};
+// const [missingAddressDialog, setMissingAddressDialog] = useState(false);
 
 const CreateEmployee = () => {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressId, setAddressId] = useState<number>(1);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [addressForm, setAddressForm] = useState({
-    location: "",
-    pincode: "",
-    contact: "",
-  });
+  const [addressForm, setAddressForm] = useState({address:"", location: "", pincode: "", contact: "" });
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
   const navigate = useNavigate();
   const location = useLocation();
   const [openSnackbar, setOpenSnackbar] = useState(location.state?.success || false);
+  const [missingAddressDialog, setMissingAddressDialog] = useState(false);
+  // const [missingAddressDialog, setMissingAddressDialog] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const orgOptions = Object.keys(companyRoles);
 
+  // const [addresses, setAddresses] = useState<Address[]>([]);  
+  const [addressErrors, setAddressErrors] = useState({
+    address:false,
+    location: false,
+    pincode: false,
+    contact: false,
+  });
+  
   const formik = useFormik({
     initialValues: {
       emp_id: "",
       name: "",
       organ: "",
       position: "",
+      addresses: [],
+     
     },
+    validate: validateZodSchema, // Using your custom Zod validation function here
     onSubmit: async (values) => {
-      if (
-        !values.emp_id.trim() ||
-        !values.name.trim() ||
-        !values.organ.trim() ||
-        !values.position.trim()
-      ) {
+      console.log("form submitted", values);
+      setIsSubmitted(true);
+  
+      // Check if all required basic fields are filled
+      if (!values.emp_id.trim() || !values.name.trim() || !values.organ.trim() || !values.position.trim()) {
         alert("Please fill in all basic employee details.");
         return;
       }
-
-      if (addresses.length === 0) {
-        alert("Please add at least one address.");
+      console.log("empty");
+      // Check if at least one address is added
+      if (values.addresses.length === 0) {
+        alert("At least one address is required.");
+        console.log("empty");
+        return;
+      }if (!Array.isArray(values.addresses) || values.addresses.length === 0) {
+        alert("At least one address is required.");
+        console.log("empty");
         return;
       }
-
-      const anyEmptyAddress = addresses.some(
-        (addr) => !addr.location.trim() || !addr.pincode.trim() || !addr.contact.trim()
-      );
-      if (anyEmptyAddress) {
-        alert("Please fill all fields in each address.");
-        return;
-      }
-
-      const data = {
-        ...values,
-        addresses,
-      };
-
+  
+      // Prepare the data and submit
+      const data = { ...values };
+  
       try {
         await createEmployee(data);
         navigate("/list", { state: { success: true } });
@@ -96,18 +101,20 @@ const CreateEmployee = () => {
       }
     },
   });
-
+  
+  
   const handleOpenDialog = (address?: Address) => {
     if (address) {
       setEditingId(address.id);
       setAddressForm({
+        address:address.address,
         location: address.location,
         pincode: address.pincode,
         contact: address.contact,
       });
     } else {
       setEditingId(null);
-      setAddressForm({ location: "", pincode: "", contact: "" });
+      setAddressForm({ address:"",location: "", pincode: "", contact: "" });
     }
     setOpenDialog(true);
   };
@@ -122,29 +129,46 @@ const CreateEmployee = () => {
   };
 
   const handleSaveAddress = () => {
-    if (!addressForm.location || !addressForm.pincode || !addressForm.contact) {
-      alert("All fields are required.");
+    const trimmed = {
+      address:addressForm.address.trim(),
+      location: addressForm.location.trim(),
+      pincode: addressForm.pincode.trim(),
+      contact: addressForm.contact.trim(),
+    };
+  
+    const errors = {
+      address: !trimmed.address,
+      location: !trimmed.location,
+      pincode: !/^\d{6}$/.test(trimmed.pincode), // Must be 6 digits
+      contact: !/^\d{10}$/.test(trimmed.contact),
+    };
+  
+    setAddressErrors(errors);
+  
+    if (errors.address||errors.location || errors.pincode || errors.contact) {
       return;
     }
-
+  
     if (editingId) {
-      setAddresses((prev) =>
-        prev.map((a) => (a.id === editingId ? { ...a, ...addressForm } : a))
+      const updated = addresses.map((a) =>
+        a.id === editingId ? { ...a, ...trimmed } : a
       );
+      setAddresses(updated);
+      formik.setFieldValue("addresses", updated);
     } else {
-      setAddresses([
-        ...addresses,
-        {
-          id: `${addressId}`,
-          ...addressForm,
-        },
-      ]);
+      const newAddress = {
+        id: `${addressId}`,
+        ...trimmed,
+      };
+      const updated = [...addresses, newAddress];
+      setAddresses(updated);
+      formik.setFieldValue("addresses", updated);
       setAddressId(addressId + 1);
     }
-
+  
     setOpenDialog(false);
   };
-
+  
   const handleDeleteAddress = (id: string) => {
     setAddresses(addresses.filter((address) => address.id !== id));
   };
@@ -161,11 +185,7 @@ const CreateEmployee = () => {
         autoHideDuration={3000}
         onClose={() => setOpenSnackbar(false)}
       >
-        <MuiAlert
-          onClose={() => setOpenSnackbar(false)}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
+        <MuiAlert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: "100%" }}>
           Submitted successfully!
         </MuiAlert>
       </Snackbar>
@@ -189,6 +209,8 @@ const CreateEmployee = () => {
                 name="emp_id"
                 value={formik.values.emp_id}
                 onChange={formik.handleChange}
+                error={formik.touched.emp_id && Boolean(formik.errors.emp_id)}
+                helperText={formik.touched.emp_id && formik.errors.emp_id}
               />
               <TextField
                 label="Employee Name"
@@ -198,31 +220,62 @@ const CreateEmployee = () => {
                 name="name"
                 value={formik.values.name}
                 onChange={formik.handleChange}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
               />
-              <TextField
-                label="Organization"
-                variant="outlined"
-                fullWidth
-                required
-                name="organ"
-                value={formik.values.organ}
-                onChange={formik.handleChange}
-              />
-              <TextField
-                label="Position"
-                variant="outlined"
-                fullWidth
-                required
-                name="position"
-                value={formik.values.position}
-                onChange={formik.handleChange}
-              />
+              <FormControl fullWidth margin="normal">
+  <InputLabel id="org-label">Organization</InputLabel>
+  <Select
+    labelId="org-label"
+    id="organ"
+    name="organ"
+    value={formik.values.organ}
+    onChange={(e) => {
+      const selectedOrg = e.target.value;
+      formik.setFieldValue("organ", selectedOrg);
+      formik.setFieldValue("position", ""); // reset position when org changes
+    }}
+    error={formik.touched.organ && Boolean(formik.errors.organ)}
+  >
+    {Object.keys(companyRoles).map((org) => (
+      <MenuItem key={org} value={org}>
+        {org}
+      </MenuItem>
+    ))}
+  </Select>
+  {formik.touched.organ && formik.errors.organ && (
+    <FormHelperText error>{formik.errors.organ}</FormHelperText>
+  )}
+</FormControl>
+
+<FormControl fullWidth margin="normal" disabled={!formik.values.organ}>
+  <InputLabel id="position-label">Position</InputLabel>
+  <Select
+    labelId="position-label"
+    id="position"
+    name="position"
+    value={formik.values.position}
+    onChange={formik.handleChange}
+    error={formik.touched.position && Boolean(formik.errors.position)}
+  >
+    {(companyRoles[formik.values.organ] || []).map((pos) => (
+      <MenuItem key={pos} value={pos}>
+        {pos}
+      </MenuItem>
+    ))}
+  </Select>
+  {formik.touched.position && formik.errors.position && (
+    <FormHelperText error>{formik.errors.position}</FormHelperText>
+  )}
+</FormControl>
+
             </Grid>
           </CardContent>
         </Card>
 
-        <Container sx={{ mt: 4 }}>
-          <Typography variant="h6">Addresses</Typography>
+        {/* Address Handling */}
+        <Container sx={{ mt: 5 }}>
+          <Typography variant="h6">Addresses(*)</Typography>
           <Stack direction="row" justifyContent="flex-end" mb={2}>
             <IconButton color="primary" onClick={() => handleOpenDialog()}>
               <Add />
@@ -233,6 +286,7 @@ const CreateEmployee = () => {
             <Table sx={{ minWidth: 650 }}>
               <TableHead>
                 <TableRow>
+                  <TableCell>Address</TableCell>
                   <TableCell>Location</TableCell>
                   <TableCell>Pincode</TableCell>
                   <TableCell>Contact</TableCell>
@@ -240,24 +294,69 @@ const CreateEmployee = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {addresses
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((address) => (
-                    <TableRow key={address.id}>
-                      <TableCell>{address.location}</TableCell>
-                      <TableCell>{address.pincode}</TableCell>
-                      <TableCell>{address.contact}</TableCell>
-                      <TableCell align="center">
-                        <IconButton color="primary" onClick={() => handleOpenDialog(address)}>
-                          <Edit />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleDeleteAddress(address.id)}>
-                          <DeleteOutline />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
+  {(addresses.length === 0
+    ? [{ address:"",location: "", pincode: "", contact: "", id: "temp" }]  // Dummy row
+    : addresses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  ).map((address) => (
+    <TableRow key={address.id || Math.random()}>
+       <TableCell>
+        {address.address ? (
+          address.address
+        ) : (
+          <Typography color="error">
+            {isSubmitted && !address.address ? "Fill this field" : ""}
+          </Typography>
+        )}
+      </TableCell>
+      <TableCell>
+        {address.location ? (
+          address.location
+        ) : (
+          <Typography color="error">
+            {isSubmitted && !address.location ? "Fill this field" : ""}
+          </Typography>
+        )}
+      </TableCell>
+      <TableCell>
+        {address.pincode ? (
+          address.pincode
+        ) : (
+          <Typography color="error">
+            {isSubmitted && !address.pincode ? "Fill this field" : ""}
+          </Typography>
+        )}
+      </TableCell>
+      <TableCell>
+        {address.contact ? (
+          address.contact
+        ) : (
+          <Typography color="error">
+            {isSubmitted && !address.contact ? "Fill this field" : ""}
+          </Typography>
+        )}
+      </TableCell>
+      <TableCell align="center">
+        <IconButton
+          color="primary"
+          onClick={() => handleOpenDialog(address)}
+          disabled={address.id === "temp"}
+        >
+          <Edit />
+        </IconButton>
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteAddress(address.id)}
+          disabled={address.id === "temp"}
+        >
+          <DeleteOutline />
+        </IconButton>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
+
+
             </Table>
 
             <TablePagination
@@ -268,41 +367,62 @@ const CreateEmployee = () => {
               rowsPerPage={rowsPerPage}
               rowsPerPageOptions={[]}
             />
-
-            <center>
-              <Button className="create-submit" variant="contained" type="submit">
-                Submit
-              </Button>
-            </center>
           </Paper>
         </Container>
+
+        <center>
+          <Button className="create-submit" variant="contained" type="submit">
+            Submit
+          </Button>
+        </center>
       </form>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>{editingId ? "Edit Address" : "Add Address"}</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-          <TextField
-            label="Location"
-            name="location"
-            value={addressForm.location}
-            onChange={handleAddressFormChange}
-            fullWidth
-          />
-          <TextField
-            label="Pincode"
-            name="pincode"
-            value={addressForm.pincode}
-            onChange={handleAddressFormChange}
-            fullWidth
-          />
-          <TextField
-            label="Contact"
-            name="contact"
-            value={addressForm.contact}
-            onChange={handleAddressFormChange}
-            fullWidth
-          />
+        <TextField
+  label="Address"
+  name="address"
+  value={addressForm.address}
+  error={addressErrors.address || (isSubmitted && !addressForm.address)}
+  helperText={(addressErrors.address || (isSubmitted && !addressForm.address)) ? "Fill this field" : ""}
+  onChange={handleAddressFormChange}
+  fullWidth
+  required
+/>
+        <TextField
+  label="Location"
+  name="location"
+  value={addressForm.location}
+  error={addressErrors.location || (isSubmitted && !addressForm.location)}
+  helperText={(addressErrors.location || (isSubmitted && !addressForm.location)) ? "Fill this field" : ""}
+  onChange={handleAddressFormChange}
+  fullWidth
+  required
+/>
+<TextField
+  label="Pincode"
+  name="pincode"
+  value={addressForm.pincode}
+  error={addressErrors.pincode || (isSubmitted && !addressForm.pincode)}
+  helperText={(addressErrors.pincode || (isSubmitted && !addressForm.pincode)) ? "Enter a valid pincode" : ""}
+  onChange={handleAddressFormChange}
+  fullWidth
+  required
+/>
+<TextField
+  label="Contact"
+  name="contact"
+  value={addressForm.contact}
+  error={addressErrors.contact || (isSubmitted && !addressForm.contact)}
+  helperText={(addressErrors.contact || (isSubmitted && !addressForm.contact)) ? "Enter a valid contact" : ""}
+  onChange={handleAddressFormChange}
+  fullWidth
+  required
+/>
+
         </DialogContent>
+       
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button onClick={handleSaveAddress} variant="contained">
@@ -310,6 +430,20 @@ const CreateEmployee = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* <Dialog open={missingAddressDialog} onClose={() => setMissingAddressDialog(false)}>
+  <DialogTitle>Missing Address</DialogTitle>
+  <DialogContent>
+    <Typography>
+      Please add at least one address before submitting the form.
+    </Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setMissingAddressDialog(false)} autoFocus>
+      OK
+    </Button>
+  </DialogActions>
+</Dialog> */}
+
     </Container>
   );
 };

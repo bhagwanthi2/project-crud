@@ -1,3 +1,4 @@
+// C:\Users\BhagwanthiM\OneDrive - 4i Apps Solutions Pvt Ltd\Desktop\project-crud\employees\src\components\EditEmployee.tsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getEmployeeById, updateEmployee } from "../services/employeeService";
@@ -10,6 +11,11 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+ import { zodResolver } from "@hookform/resolvers/zod";
+import { employeeSchema } from "../validations/employeeSchema";
+import { z } from "zod";
+
+type EmployeeFormData = z.infer<typeof employeeSchema>;
 
 const EditEmployee = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +26,7 @@ const EditEmployee = () => {
     name: "",
     organ: "",
     position: "",
-    addresses: [{ location: "", pincode:0 , contact:0}],
+    addresses: [{ address:"",location: "", pincode:0 , contact:0}],
   });
 
   useEffect(() => {
@@ -47,10 +53,10 @@ const EditEmployee = () => {
     const updated = [...employee.addresses];
     const updatedAddress = { ...updated[index] };
   
-    if (name === "pincode" || name === "contact") {
+    if (name === "address" || name === "location") {
+      updatedAddress[name as "address" | "location"] = value;
+    } else if (name === "pincode" || name === "contact") {
       updatedAddress[name as "pincode" | "contact"] = Number(value);
-    } else {
-      updatedAddress[name as "location"] = value;
     }
   
     updated[index] = updatedAddress;
@@ -77,7 +83,7 @@ const EditEmployee = () => {
             name="emp_id"
             value={employee.emp_id}
             fullWidth
-            disabled
+            
           />
           <TextField
             label="Name"
@@ -104,6 +110,13 @@ const EditEmployee = () => {
           <Typography variant="h6" sx={{ mt: 2 }}>Addresses</Typography>
           {employee.addresses.map((addr, index) => (
             <Stack key={index} spacing={1}>
+               <TextField
+                label="Address"
+                name="address"
+                value={addr.address}
+                onChange={(e) => handleAddressChange(index, e)}
+                fullWidth
+              />
               <TextField
                 label="Location"
                 name="location"
