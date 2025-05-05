@@ -1,0 +1,81 @@
+.container {
+    margin-top: 30px;
+    /* mar */
+  }
+  
+  h4 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  h6 {
+    font-size: 1.25rem;
+    font-weight: 600; /* semi-bold equivalent */
+    margin-bottom: 20px;
+  }
+  
+  form {
+    margin-bottom: 20px;
+  }
+  
+  form .MuiTextField-root {
+    margin-bottom: 26px;
+    background-color: #f9f9f9; /* subtle background to highlight editable fields */
+    border-radius: 4px;
+  }
+  
+  form .MuiButton-root {
+    background-color: #d25d19;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  form .MuiButton-root:hover {
+    background-color: #54c015;
+  }
+  
+  .MuiPaper-root {
+    padding: 20px;
+  }
+  
+  .MuiTableHead-root {
+    background-color: #f5f5f5;
+  }
+  
+  .MuiTableCell-root {
+    padding: 16px;
+  }
+  
+  .MuiTextField-root {
+    width: 100%;
+  }
+  
+  .MuiTextField-root input {
+    background-color: #fff; /* ensures input fields are white */
+  }
+  
+  .MuiIconButton-root {
+    margin-right: 20px;
+    color: #d32f2f;
+  }
+  
+  .MuiIconButton-root:hover {
+    background-color: #fbe9e7;
+  }
+  
+  .MuiTableRow-root:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .MuiStack-root {
+    margin-bottom: 20px;
+  }
+  
+  .MuiTextField-root input:focus {
+    outline: 2px solid #d25d19; /* Focus effect for input fields */
+  }
+  

@@ -166,6 +166,12 @@ import "./ListEmployee.css";
     setSelectedId(id);
     setOpenDialog(true);
   };
+  // const filteredEmployees = employees.filter((emp) =>
+  //   (emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //    emp.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //    emp.organ.toLowerCase().includes(searchTerm.toLowerCase()))
+  //   && (orgFilter ? emp.organ === orgFilter : true)
+  // );
   
   const handleConfirmDelete = async () => {
     if (selectedId) {
@@ -250,22 +256,30 @@ import "./ListEmployee.css";
       </Stack>
 
       {showFilter && (
-        <Box sx={{ mb: 2, width: 250 }}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Filter by Organization</InputLabel>
-            <Select
-              value={orgFilter}
-              onChange={handleOrgFilter}
-              label="Filter by Organization"
-            >
-              <MenuItem value="">All</MenuItem>
-              {uniqueOrgs.map((org) => (
-                <MenuItem key={org} value={org}>{org}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-      )}
+  <Box sx={{ mb: 2 }}>
+    <Stack direction="row" spacing={2} alignItems="center">
+      <FormControl sx={{ minWidth: 250 }} size="small">
+        <InputLabel>Filter by Organization</InputLabel>
+        <Select
+          value={orgFilter}
+          onChange={handleOrgFilter}
+          label="Filter by Organization"
+        >
+          <MenuItem value="">All</MenuItem>
+          {uniqueOrgs.map((org) => (
+            <MenuItem key={org} value={org}>{org}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+     
+      <Button variant="outlined" color="primary" onClick={() => setOrgFilter("")}>
+        Clear Filter
+      </Button>
+    </Stack>
+  </Box>
+)}
+
 
       <TableContainer component={Paper} className="table-container">
         <Table>

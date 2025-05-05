@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Employee } from '../types/Employee';
 
-const API_URL = 'http://localhost:3000/employees';
+const API_URL = 'http://localhost:3001/employees';
 
 export const getEmployees = () => axios.get<Employee[]>(API_URL);
 
