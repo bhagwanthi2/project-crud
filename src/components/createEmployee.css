@@ -1,77 +1,130 @@
+/* Layout & Typography */
 .container {
-    margin-top: 20px;
-  }
-  
-  h4 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  h6 {
-    font-size: 1.25rem;
-    font-weight: semi-bold;
-    margin-bottom: 20px;
-  }
+  margin-top: 32px;
+  padding: 24px;
+  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
 
-  form {
-    margin-bottom: 20px;
-  }
-  
-  form .MuiTextField-root {
-    margin-bottom: 16px;
-  }
-  
-  form .MuiButton-root {
-    background-color: #d25d19;
-    color: white;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  form .MuiButton-root:hover {
-    background-color: #1565c0;
-  }
-  
-  .MuiPaper-root {
-    padding: 20px;
-  }
-  
-  .MuiTableHead-root {
-    background-color: #f5f5f5;
-  }
-  
-  .MuiTableCell-root {
-    padding: 16px;
-  }
-  
-  .MuiTextField-root {
-    width: 100%;
-  }
-  
-  .MuiIconButton-root {
-    margin-right: 20px;
-  }
-  
-  .MuiIconButton-root:hover {
-    background-color: #e3f2fd;
-  }
-  
-  .MuiTableRow-root:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .MuiIconButton-root {
-    color: #d32f2f;
-  }
-  
-  .MuiIconButton-root:hover {
-    background-color: #fbe9e7;
-  }
-  
-  .MuiStack-root {
-    margin-bottom: 20px;
-  }
-  
+h4 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+h6 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #34495e;
+}
+
+/* Form Styling */
+form {
+  margin-bottom: 20px;
+}
+
+form .MuiTextField-root {
+  margin-bottom: 20px;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+form .MuiButton-root {
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-transform: none;
+  transition: background 0.3s ease;
+}
+
+form .MuiButton-root:hover {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+/* Table Styling */
+.MuiPaper-root {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.MuiTableHead-root {
+  background: #f0f4ff;
+}
+
+.MuiTableCell-root {
+  padding: 16px;
+  font-size: 15px;
+  color: #2f3640;
+}
+
+.MuiTableRow-root:hover {
+  background-color: #f9f9f9;
+  transition: background 0.3s ease;
+}
+
+/* Buttons & Icons */
+.MuiIconButton-root {
+  margin-right: 16px;
+  color: #e74c3c;
+  transition: background 0.2s ease, transform 0.2s ease;
+  border-radius: 8px;
+}
+
+.MuiIconButton-root:hover {
+  background-color: #fdecea;
+  transform: scale(1.1);
+}
+
+/* Stacking and spacing */
+.MuiStack-root {
+  margin-bottom: 24px;
+}
+.MuiTableHead-root {
+  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue header */
+}
+
+.MuiTableCell-head {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px;
+}
+.MuiInputBase-input {
+  color: #111111; /* Extra dark input text */
+  font-weight: 600;
+}
+
+.MuiInputLabel-root {
+  color: #555555; /* Default label color */
+  font-weight: 500;
+  background-color: white;
+}
+
+.MuiInputLabel-root.Mui-focused {
+  color: #000000 !important; 
+  font-size: large;
+  background-color: #f9f9f9;
+
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #86807a !important; /* Stronger outline on focus */
+  border-width: 2px;
+  background-color: white;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: #cccccc;
+  /* background-color: #fdecea; */
+}

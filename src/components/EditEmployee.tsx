@@ -69,7 +69,7 @@ const EditEmployee = () => {
     };
     fetchEmployee();
   }, [id]);
-
+ 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
   };

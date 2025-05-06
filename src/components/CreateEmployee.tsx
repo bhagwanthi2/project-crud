@@ -31,7 +31,7 @@ type Address = {
   contact: string;
 };
 // const [selectedAddressIds, setSelectedAddressIds] = useState<string[]>([]);
-
+import '../components/createEmployee.css';
 
 const CreateEmployee = () => {
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -245,6 +245,7 @@ const handleSelectRow = (id: string) => {
   <Select
     labelId="org-label"
     id="organ"
+     variant="outlined"
     name="organ"
     value={formik.values.organ}
     onChange={(e) => {
@@ -297,7 +298,7 @@ const handleSelectRow = (id: string) => {
  
 </Stack>
 
-          <Typography variant="h6">Addresses(*)</Typography>
+          <Typography variant="h6">Addresses</Typography>
           <Stack direction="row" justifyContent="flex-end" mb={2}>
           <IconButton color="error" onClick={handleDeleteSelectedAddresses} disabled={selectedAddressIds.length === 0}>
     <DeleteOutline />
@@ -430,6 +431,7 @@ const handleSelectRow = (id: string) => {
   required
 />
         <TextField
+        
   label="Location"
   name="location"
   value={addressForm.location}

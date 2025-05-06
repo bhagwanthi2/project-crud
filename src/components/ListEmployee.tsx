@@ -60,7 +60,7 @@ import "./ListEmployee.css";
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [loadingDelete, setLoadingDelete] = useState(false);
   const location = useLocation(); 
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true); 
 
   
 
@@ -91,14 +91,13 @@ import "./ListEmployee.css";
       setLoading(true);
       const response = await getEmployees();
   
-      // Simulate delay
       setTimeout(() => {
         setEmployees(response.data);
         setLoading(false);
       }, 1000);
     } catch (error) {
       console.error("Failed to fetch employees", error);
-      setLoading(false); // Stop spinner on error
+      setLoading(false);
     }
   };
   
@@ -108,6 +107,11 @@ import "./ListEmployee.css";
   const handleBatchDelete = () => {
     setOpenBatchDialog(true);
   };
+
+
+
+
+
   const handleConfirmBatchDelete = async () => {
     setLoadingDelete(true);
     await Promise.all(selected.map(id => deleteEmployee(id)));
@@ -166,13 +170,7 @@ import "./ListEmployee.css";
     setSelectedId(id);
     setOpenDialog(true);
   };
-  // const filteredEmployees = employees.filter((emp) =>
-  //   (emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //    emp.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //    emp.organ.toLowerCase().includes(searchTerm.toLowerCase()))
-  //   && (orgFilter ? emp.organ === orgFilter : true)
-  // );
-  
+ 
   const handleConfirmDelete = async () => {
     if (selectedId) {
       setLoadingDelete(true);
