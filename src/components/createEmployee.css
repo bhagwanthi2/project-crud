@@ -1,8 +1,8 @@
-/* Layout & Typography */
+/* /* Layout & Typography */
 .container {
   margin-top: 32px;
   padding: 24px;
-  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+  background: linear-gradient(to right, #8f96a1, #809ece);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -21,7 +21,6 @@ h6 {
   color: #34495e;
 }
 
-/* Form Styling */
 form {
   margin-bottom: 20px;
 }
@@ -31,9 +30,9 @@ form .MuiTextField-root {
   width: 100%;
   background-color: #ffffff;
   border-radius: 8px;
-}
+} 
 
-form .MuiButton-root {
+ form .MuiButton-root {
   background: linear-gradient(135deg, #ff7e5f, #feb47b);
   color: white;
   font-size: 16px;
@@ -42,54 +41,49 @@ form .MuiButton-root {
   border-radius: 8px;
   text-transform: none;
   transition: background 0.3s ease;
-}
+} 
 
 form .MuiButton-root:hover {
   background: linear-gradient(135deg, #6a11cb, #2575fc);
-}
+} 
 
-/* Table Styling */
-.MuiPaper-root {
+MuiPaper-root {
   padding: 20px;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-}
+} 
 
 .MuiTableHead-root {
   background: #f0f4ff;
-}
+} 
 
-.MuiTableCell-root {
+
+ .MuiTableCell-root {
   padding: 16px;
   font-size: 15px;
   color: #2f3640;
-}
+} 
 
-.MuiTableRow-root:hover {
-  background-color: #f9f9f9;
-  transition: background 0.3s ease;
-}
 
-/* Buttons & Icons */
-.MuiIconButton-root {
+
+ .MuiIconButton-root {
   margin-right: 16px;
   color: #e74c3c;
   transition: background 0.2s ease, transform 0.2s ease;
   border-radius: 8px;
-}
+} 
 
 .MuiIconButton-root:hover {
   background-color: #fdecea;
   transform: scale(1.1);
-}
+} 
 
-/* Stacking and spacing */
 .MuiStack-root {
   margin-bottom: 24px;
 }
 .MuiTableHead-root {
-  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue header */
+  background: linear-gradient(to right, #387b80, #00f2fe); 
 }
 
 .MuiTableCell-head {
@@ -101,30 +95,24 @@ form .MuiButton-root:hover {
   padding: 16px;
 }
 .MuiInputBase-input {
-  color: #111111; /* Extra dark input text */
+  color: #111111;
   font-weight: 600;
 }
 
-.MuiInputLabel-root {
-  color: #555555; /* Default label color */
-  font-weight: 500;
-  background-color: white;
-}
 
 .MuiInputLabel-root.Mui-focused {
   color: #000000 !important; 
   font-size: large;
-  background-color: #f9f9f9;
+  background-color: #f9f9f977;
 
 }
 
 .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #86807a !important; /* Stronger outline on focus */
+  border-color: #3f372f !important; 
   border-width: 2px;
-  background-color: white;
+  /* background-color: white; */
 }
 
 .MuiOutlinedInput-notchedOutline {
   border-color: #cccccc;
-  /* background-color: #fdecea; */
-}
+} 

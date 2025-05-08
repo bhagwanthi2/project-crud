@@ -42,7 +42,7 @@ import {
 } from "@mui/material";
 
 import { Employee } from "../types/Employee";
-import "./ListEmployee.css";
+// import "./ListEmployee.css";
 
   const ListEmployee = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);

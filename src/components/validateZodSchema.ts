@@ -1,17 +1,21 @@
-import { z } from "zod";
+// import { z } from "zod";
 import { employeeSchema } from './zod';
 
-export const validateZodSchema = (values: any) => {
-  const errors: { [key: string]: string } = {};
- 
-  const result = employeeSchema.safeParse(values);
+export function validateZodSchema(data: any) {
+  const result = employeeSchema.safeParse(data);
+  if (result.success) return {};
 
-  if (!result.success) {
-    result.error.errors.forEach((err) => {
-      const path = err.path.join(".");
-      errors[path] = err.message;
-    });
+  const errors: { [key: string]: string } = {};
+
+  for (const issue of result.error.issues) {
+    const path = issue.path
+      .map((segment) => (typeof segment === "number" ? `[${segment}]` : segment))
+      .join(".");
+
+    const formattedPath = path.replace(/\.(\[\d+\])/g, "$1"); // Fixes addresses.0.contact to addresses[0].contact
+
+    errors[formattedPath] = issue.message;
   }
 
-  return errors; 
-};
+  return errors;
+}

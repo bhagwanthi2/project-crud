@@ -1,10 +1,17 @@
 import { z } from "zod";
-
 export const addressSchema = z.object({
-    address:z.string().min(1,"Address is required"),
+  address: z.string().min(1, "Address is required"),
   location: z.string().min(1, "Location is required"),
-  pincode: z.preprocess((val) => Number(val), z.number().int().min(100000, "Invalid pincode").max(999999, "Invalid pincode")),
-  contact: z.preprocess((val) => Number(val), z.number().int().min(1000000000, "Invalid contact number").max(9999999999, "Invalid contact number")),
+  pincode: z
+    .number({ invalid_type_error: "Pincode must be a number" })
+    .refine((val) => /^\d{6}$/.test(val.toString()), {
+      message: "Pincode must be 6 digits",
+    }),
+  contact: z
+    .number({ invalid_type_error: "Contact must be a number" })
+    .refine((val) => /^\d{10}$/.test(val.toString()), {
+      message: "Contact must be 10 digits",
+    }),
 });
 
 export const employeeSchema = z.object({

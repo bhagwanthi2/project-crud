@@ -142,9 +142,12 @@ const handleSelectRow = (id: string) => {
 
   const handleAddressFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setAddressForm({ ...addressForm, [name]: value });
-  };
+    const updatedValue = name === "emp_id" ? Number(value) : value;
 
+    setAddressForm({ ...addressForm, [name]: updatedValue });
+  };
+ 
+  
   const handleSaveAddress = () => {
     const trimmed = {
       address:addressForm.address.trim(),
@@ -156,7 +159,7 @@ const handleSelectRow = (id: string) => {
     const errors = {
       address: !trimmed.address,
       location: !trimmed.location,
-      pincode: !/^\d{6}$/.test(trimmed.pincode), // Must be 6 digits
+      pincode: !/^\d{6}$/.test(trimmed.pincode), 
       contact: !/^\d{10}$/.test(trimmed.contact),
     };
   
@@ -218,17 +221,18 @@ const handleSelectRow = (id: string) => {
               Basic Details
             </Typography>
             <Grid sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <TextField
-                label="Employee ID"
-                variant="outlined"
-                fullWidth
-                required
-                name="emp_id"
-                value={formik.values.emp_id}
-                onChange={formik.handleChange}
-                error={formik.touched.emp_id && Boolean(formik.errors.emp_id)}
-                helperText={formik.touched.emp_id && formik.errors.emp_id}
-              />
+            <TextField
+  label="Employee ID"
+  variant="outlined"
+  fullWidth
+  required
+  name="emp_id"
+  value={formik.values.emp_id}
+  onChange={formik.handleChange}
+  error={formik.touched.emp_id && Boolean(formik.errors.emp_id)}
+  helperText={formik.touched.emp_id && formik.errors.emp_id}
+/>
+
               <TextField
                 label="Employee Name"
                 variant="outlined"
@@ -303,7 +307,7 @@ const handleSelectRow = (id: string) => {
           <IconButton color="error" onClick={handleDeleteSelectedAddresses} disabled={selectedAddressIds.length === 0}>
     <DeleteOutline />
   </IconButton>
-            <IconButton color="primary" onClick={() => handleOpenDialog()}>
+            <IconButton id="add" onClick={() => handleOpenDialog()}>
               <Add />
             </IconButton>
           </Stack>

@@ -22,7 +22,17 @@ import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 // import IconButton from "@mui/material/IconButton";
+import Dialog from "@mui/material/Dialog";
+  import DialogTitle from "@mui/material/DialogTitle";
+  import DialogContent from "@mui/material/DialogContent";
+  import DialogActions from "@mui/material/DialogActions";
+  import formik from "formik";
+  import { useFormik } from "formik";
+  // import { z } from "zod";
+  // import { toFormikValidationSchema } from "@hookform/resolvers/zod";
+  import { toFormikValidationSchema } from 'zod-formik-adapter';
 
+  
 import {
    Card, CardContent, Grid } from '@mui/material';
 import {
@@ -50,7 +60,20 @@ const EditEmployee = () => {
     position: "",
     addresses: [{ address:"",location: "", pincode:0 , contact:0}],
   });const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
+  
+  // Address schema
+  const addressSchema = z.object({
+    address: z.string().min(1, "Address required"),
+    location: z.string().min(1, "Location required"),
+    pincode: z.number().min(100000, "Invalid pincode"),
+    contact: z.number().min(1000000000, "Invalid contact"),
+  });
+  
+  type AddressForm = z.infer<typeof addressSchema>;
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const handleSelectRow = (index: number) => {
     setSelectedRows((prev) =>
@@ -69,7 +92,25 @@ const EditEmployee = () => {
     };
     fetchEmployee();
   }, [id]);
- 
+  const formik = useFormik<AddressForm>({
+    initialValues: {
+      address: "",
+      location: "",
+      pincode: 0,
+      contact: 0,
+    },
+    validationSchema: toFormikValidationSchema(addressSchema),
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      if (editingIndex !== null) {
+        const updated = [...employee.addresses];
+        updated[editingIndex] = values;
+        setEmployee({ ...employee, addresses: updated });
+        setIsDialogOpen(false);
+      }
+    },
+  });
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
   };
@@ -241,7 +282,58 @@ const EditEmployee = () => {
 </Stack>
 
         {/* <Grid sx={{ display: "flex", flexDirection: "column", gap: 2 }}> */}
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper}><Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} fullWidth maxWidth="sm">
+  <DialogTitle>Edit Address</DialogTitle>
+  <form onSubmit={formik.handleSubmit}>
+    <DialogContent>
+      <Stack spacing={2}>
+        <TextField
+          label="Address"
+          name="address"
+          value={formik.values.address}
+          onChange={formik.handleChange}
+          error={formik.touched.address && !!formik.errors.address}
+          helperText={formik.touched.address && formik.errors.address}
+          fullWidth
+        />
+        <TextField
+          label="Location"
+          name="location"
+          value={formik.values.location}
+          onChange={formik.handleChange}
+          error={formik.touched.location && !!formik.errors.location}
+          helperText={formik.touched.location && formik.errors.location}
+          fullWidth
+        />
+        <TextField
+          label="Pincode"
+          name="pincode"
+          type="number"
+          value={formik.values.pincode}
+          onChange={formik.handleChange}
+          error={formik.touched.pincode && !!formik.errors.pincode}
+          helperText={formik.touched.pincode && formik.errors.pincode}
+          fullWidth
+        />
+        <TextField
+          label="Contact"
+          name="contact"
+          type="number"
+          value={formik.values.contact}
+          onChange={formik.handleChange}
+          error={formik.touched.contact && !!formik.errors.contact}
+          helperText={formik.touched.contact && formik.errors.contact}
+          fullWidth
+        />
+      </Stack>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+      <Button type="submit" variant="contained">Save</Button>
+    </DialogActions>
+  </form>
+</Dialog>
+
   <Table>
     <TableHead>
       <TableRow>
@@ -267,7 +359,7 @@ const EditEmployee = () => {
             <TextField
               name="address"
               value={addr.address}
-              onChange={(e) => handleAddressChange(index, e)}
+              // onChange={(e) => handleAddressChange(index, e)}
               fullWidth
             />
           </TableCell>
@@ -275,7 +367,7 @@ const EditEmployee = () => {
             <TextField
               name="location"
               value={addr.location}
-              onChange={(e) => handleAddressChange(index, e)}
+              // onChange={(e) => handleAddressChange(index, e)}
               fullWidth
             />
           </TableCell>
@@ -283,7 +375,7 @@ const EditEmployee = () => {
             <TextField
               name="pincode"
               value={addr.pincode}
-              onChange={(e) => handleAddressChange(index, e)}
+              // onChange={(e) => handleAddressChange(index, e)}
               fullWidth
             />
           </TableCell>
@@ -291,14 +383,21 @@ const EditEmployee = () => {
             <TextField
               name="contact"
               value={addr.contact}
-              onChange={(e) => handleAddressChange(index, e)}
+              // onChange={(e) => handleAddressChange(index, e)}
               fullWidth
             />
           </TableCell>
           <TableCell>
-            <IconButton onClick={() => setSelectedRow(index)}>
-              <EditIcon />
-            </IconButton>
+          <IconButton
+  onClick={() => {
+    setEditingIndex(index);
+    formik.setValues(employee.addresses[index]); // Pre-fill
+    setIsDialogOpen(true);
+  }}
+>
+  <EditIcon />
+</IconButton>
+
             <IconButton onClick={() => handleDeleteAddress(index)}>
               <DeleteIcon />
             </IconButton>
@@ -326,4 +425,3 @@ const EditEmployee = () => {
 };
 
 export default EditEmployee;
-
